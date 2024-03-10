@@ -1,0 +1,140 @@
+﻿<!Doctype html>
+<html>
+<head>
+	<title>俄罗斯方块</title>
+	<meta charset="utf-8" />
+	<style>
+		* {
+			padding: 0;
+			margin: 0;
+		}
+		#mainGame {
+			width: 100vw;
+			height: 100vh;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+		}
+		.main canvas {
+			box-shadow: 0 0 8px #aaa;
+		}
+		.main canvas:nth-child(1) {
+			float: left;
+			margin-right: 21px;
+			border-radius: 12px 0 0 0;
+		}
+		.main canvas:nth-child(2) {
+			float: right;
+			margin-left: 21px;
+			border-radius: 0 12px 0 0;
+		}
+		#info {
+			width: 618px;
+			border-radius: 0 0 12px 12px;
+			box-shadow: 0 0 8px #aaa;
+			padding: 12px;
+			position:relative;
+			height:calc(100% - 800px);
+		}
+		#info svg {
+			vertical-align: middle;
+			position: relative;
+			top: -2px;
+		}
+		#info svg:not(#betterOne,#betterTwo) {
+			margin-right: 6px;
+			cursor:pointer;
+		}
+		#game-title {
+			image-rendering: pixelated;
+			margin-bottom: 24px;
+			position: relative;
+		}
+		#help {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			margin: auto;
+			width: 300px;
+			height: 300px;
+			border: 0;
+			border-radius: 12px;
+			padding: 24px;
+			outline: none;
+			overflow:hidden;
+		}
+		#help p {
+			text-indent: 2rem;
+		}
+		#betterOne,#betterTwo{
+			margin-right:-4px;
+			display:none;
+		}
+		#info center div canvas{
+			border:1px solid #aaa;
+		}
+		#control{
+			padding:12px 24px;
+			font-size:1.5rem;
+			line-height:15px;
+			border-radius:12px;
+			margin-top:8px;
+			background:transparent;
+			cursor:pointer;
+		}
+	</style>
+</head>
+<body onload="init();">
+	<div id="mainGame">
+		<div id="game-title" align="center">
+			<img src="img/Tetris_Logo.png" width="180" />
+			<sup style="position:absolute;top:-14px;right:-14px;">&reg;</sup>
+		</div>
+		<div class="main" align="center" style="margin-bottom:16px;">
+			<canvas id="tetrisCanvasOne" width="300" height="600">Sorry ths browser don't support canvas,please use others.</canvas>
+			<canvas id="tetrisCanvasTwo" width="300" height="600">Sorry ths browser don't support canvas,please use others.</canvas>
+		</div>
+		<div id="info">
+			<center>
+				<div style="position:absolute;left:12px;top:12px;">
+					<svg onclick="document.querySelector('#help').showModal();" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-help-circle"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+					<svg id="betterOne" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="gold" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-award"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+					<b id="nameOne" contenteditable="true">玩家甲</b>&emsp;<b id="scoreOne">0 pts</b>
+					<br /><small>下一个方块</small><br /><canvas width="130" height="52" id="tetrisCanvasOneNext">Sorry ths browser don't support canvas,please use others.</canvas>
+				</div>
+				<h2 id="status">等待开始</h2>
+				<button onclick="sOrs(this)" id="control">开始</button>
+				<div style="position:absolute;right:12px;top:12px;">
+					<svg onclick="document.querySelector('#help').showModal();" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-help-circle"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+					<svg id="betterTwo" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="gold" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-award"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+					<b id="nameTwo" contenteditable="true">玩家乙</b>&emsp;<b id="scoreTwo">0 pts</b>
+					<br /><small>下一个方块</small><br /><canvas width="130" height="52" id="tetrisCanvasTwoNext">Sorry ths browser don't support canvas,please use others.</canvas>
+				</div>
+			</center>
+		</div>
+	</div>
+	<canvas style="display:none;" id="boardCanvas" width="300" height="600"></canvas>
+	<dialog id="help">
+		<b translate="no" style="cursor:pointer;position:absolute;right:8px;top:8px;" onclick="document.querySelector('#help').close();">X</b>
+		<center><h2 style="line-height:2rem;">帮助文档</h2></center>
+		<div style="overflow:auto;height:70%;margin-top:1em;">
+			<p>本游戏支持二人同时同机游玩俄罗斯方块，并且稍微修改了部分玩法，所以本游戏实际上属于变种俄罗斯方块。</p>
+			<p>玩家甲可以按下 A D 来左右移动，按下 S 加速下降。</p>
+			<p>玩家乙可以按下 &#8592; &#8594; 来左右移动，按下 &#8595; 加速下降。</p>
+			<p>你可以点击 玩家甲/玩家乙 来直接修改对战双方的名字。</p>
+			<p>本变种俄罗斯方块不存在旋转键，但随机的方块仍然可能是基础方块的旋转体。</p>
+			<p>取而代之的是“板块模型”机制，当一个方块在左右方向被挡住时，继续左右移动，被挡住的方块将不动，但是没被挡住的方块会因为“惯性”而向预计方向移动，这种移动直到任意一个方块的下方被挡住为止。</p>
+			<br /><hr /><br />
+			<b>相关数据：</b><br />
+			<span>下降速度：2格每秒</span><br />
+			<span>随机策略：不组包</span><br />
+			<span>代码、美工：DreamAch</span>
+			
+		</div>
+	</dialog>
+	<script src="Tetris_Basic.js"></script>
+</body>
+</html>
